@@ -11,7 +11,7 @@ __NB : This forked made some modifications to be compatible with newer versions 
 Add `easymotion.kak` to your autoload directory,`~/.config/kak/autoload`, or source it manually. __In my config `kakrc`, it looks like this :__
 
 ```
-plug "[https://github.com/danr/kakoune-easymotion.git](https://github.com/alexblanc1/kakoune-easymotion-alex.git)" config %{
+plug "https://github.com/alexblanc1/kakoune-easymotion-alex.git" config %{
     face global EasyMotionBackground rgb:000001
     face global EasyMotionForeground rgb:ee3a8c,rgb:000000+fg
     face global EasyMotionSelected yellow+b
