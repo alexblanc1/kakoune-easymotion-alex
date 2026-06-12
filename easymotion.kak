@@ -14,7 +14,7 @@ def pydef -params 3 %{ eval %sh{
                     reply = 'echo -debug %%~%s error: {}~'.format(e)
                 with open('%s', 'w') as r:
                     r.write(reply)" "$pyfifo" "$1" "$kakfifo"
-    (python $file) > /dev/null 2>&1 </dev/null &
+    (python3 $file) > /dev/null 2>&1 </dev/null &
     pypid=$!
     echo "
         def -override $1 %{
@@ -51,20 +51,37 @@ def easy-motion-WORD -params 0..2 %{ easy-motion-on-regex '\s\K\S+' 'bglGt' %arg
 def easy-motion-line -params 0..2 %{ easy-motion-on-regex '^[^\n]+$' 'bglGt' %arg{1} %arg{2} }
 def easy-motion-char -params 0..2 %{ on-key %{ easy-motion-on-regex "\Q%val{key}\E" 'bglGt' %arg{1} %arg{2} } }
 
+# Termine un saut une fois la région établie : oriente les sélections,
+# lance l'attente des touches, et restaure scrolloff après coup.
+def -hidden _easy-motion-finish -params 1..3 %{
+    exec ) <a-:>
+    easy-motion-on-selections %arg{1} %arg{2} %arg{3}
+    hook window -once NormalKey  .* %{ set-option window scrolloff %opt{_scrolloff} }
+    hook window -once NormalIdle .* %{ set-option window scrolloff %opt{_scrolloff} }
+}
+
 def easy-motion-on-regex -params 1..4 %{
     set-option window _scrolloff %opt{scrolloff}
     set-option window scrolloff 0,0
 
-    exec <space>G %arg{2} <a-\;>s %arg{1} <ret> ) <a-:>
-    easy-motion-on-selections %arg{2} %arg{3} %arg{4}
-
-    hook window -once NormalKey .* %{
-        set-option window scrolloff %opt{_scrolloff}
-    }
-    hook window -once NormalIdle .* %{
-        set-option window scrolloff %opt{_scrolloff}
+    try %{
+        # 1) on tente dans la direction demandée
+        # NB: depuis Kakoune 2021+, « ne garder que la sélection principale »
+        # est sur , (le <space> d'origine ouvre désormais les user modes)
+        exec ,G %arg{2} <a-\;>s %arg{1} <ret>
+        _easy-motion-finish %arg{2} %arg{3} %arg{4}
+    } catch %{
+        try %{
+            # 2) rien dans cette direction → repli sur tout l'écran visible (gtGb)
+            exec gtGb s %arg{1} <ret>
+            _easy-motion-finish bglGt %arg{3} %arg{4}
+        } catch %{
+            # 3) l'écran ne contient vraiment aucune cible → on restaure, sans erreur
+            set-option window scrolloff %opt{_scrolloff}
+        }
     }
 }
+
 
 def _on_key -hidden -params .. %{
     on-key %{ eval %sh{
@@ -140,13 +157,13 @@ pydef 'easy-motion-on-selections -params ..3' '%opt{em_jumpchars}^%val{timestamp
 }
 
 def -hidden _easy-motion-addhl %{
-    try %{ addhl window/ fill EasyMotionBackground }
-    try %{ addhl window/ replace-ranges em_fg }
+    try %{ addhl window/easymotion_bg fill EasyMotionBackground }
+    try %{ addhl window/easymotion_fg replace-ranges em_fg }
 }
 
 def -hidden _easy-motion-rmhl %{
-    rmhl window/fill_EasyMotionBackground
-    rmhl window/replace-ranges_em_fg
+    try %{ rmhl window/easymotion_bg }
+    try %{ rmhl window/easymotion_fg }
 }
 
 # user modes can't have dash (yet)
