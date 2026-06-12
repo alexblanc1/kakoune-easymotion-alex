@@ -1,44 +1,34 @@
-# kakoune-easymotion
+# Forked-kakoune-easymotion
 ​
-[![IRC][IRC Badge]][IRC]
-
 [kakoune](http://kakoune.org) plugin for navigating like the easymotion vim mode
+
+__NB : This forked made some modifications to be compatible with newer versions of Kakoune and fixed sommes issues. Moreover, it's modified mainly to suits my own needs and to make it permanant.__
 
 ![demo](https://github.com/danr/kakoune-easymotion/blob/master/recording.gif?raw=true)
 
 ## Setup
 
-Add `easymotion.kak` to your autoload directory,`~/.config/kak/autoload`, or source it manually.
+Add `easymotion.kak` to your autoload directory,`~/.config/kak/autoload`, or source it manually. __In my config `kakrc`, it looks like this :__
 
-## Usage
-
-The script defines a few commands:
-  - `easy-motion-f`
-  - `easy-motion-w`
-  - `easy-motion-W`
-  - `easy-motion-j`
-  - `easy-motion-alt-f`
-  - `easy-motion-b`
-  - `easy-motion-B`
-  - `easy-motion-k`
-  - `easy-motion-on-regex`
-
-It uses one option, `em_jumpchars` which defaults to `a..z`,
-and two faces, `EasyMotionForeground` and `EasyMotionBackground`.
-They default to red and light grey.
-
-I don't suggest any particular mappings, but you could try:
 ```
-map global user w :easy-motion-w<ret>
-map global user W :easy-motion-W<ret>
-map global user j :easy-motion-j<ret>
+plug "https://github.com/danr/kakoune-easymotion.git" config %{
+    face global EasyMotionBackground rgb:000001
+    face global EasyMotionForeground rgb:ee3a8c,rgb:000000+fg
+    face global EasyMotionSelected yellow+b
+    # new map bidirectionnal
+    map global easymotion e ': easy-motion-word<ret>' -docstring 'word ↔'
+    map global easymotion l ': easy-motion-line<ret>' -docstring 'line ↔'
+    map global easymotion c ': easy-motion-char<ret>' -docstring 'char ↔'
+}
+# --- Entrer easymotion mode ---
+map global normal <a-space> ': enter-user-mode easymotion<ret>'
 ```
 
-or use the provided `easymotion` user-mode.
+
+
+
+
 
 ## License
 
 Unlicense
-
-[IRC]: https://webchat.freenode.net?channels=kakoune
-[IRC Badge]: https://img.shields.io/badge/IRC-%23kakoune-blue.svg
