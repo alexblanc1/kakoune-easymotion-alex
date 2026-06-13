@@ -2,7 +2,7 @@
 ​
 [kakoune](http://kakoune.org) plugin for navigating like the easymotion vim mode
 
-__NB : This forked made some modifications to be compatible with newer versions of Kakoune and fixed sommes issues. Moreover, it's modified mainly to suits my own needs and to make it permanant.__
+__NB : This forked made some modifications to be compatible with newer versions of Kakoune and fixed some issues. Moreover, it's modified mainly to suits my own needs and to make it permanant.__
 
 ![demo](https://github.com/danr/kakoune-easymotion/blob/master/recording.gif?raw=true)
 
